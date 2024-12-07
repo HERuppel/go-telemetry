@@ -1,6 +1,7 @@
-FROM golang:1.23.3-alpine as build
+FROM golang:1.23.3-alpine AS build
 
 WORKDIR /app
+
 COPY . .
 
 RUN go mod tidy

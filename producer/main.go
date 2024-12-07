@@ -36,11 +36,25 @@ func generateRandomEvent() entities.Event {
 }
 
 func createProducer(brokers []string) (sarama.SyncProducer, error) {
-	producer, err := sarama.NewSyncProducer(brokers, nil)
-	if err != nil {
-		return nil, err
+	var producer sarama.SyncProducer
+	var err error
+	const (
+		maxRetries    = 10
+		retryInterval = 5
+	)
+
+	for i := 0; i < maxRetries; i++ {
+		producer, err = sarama.NewSyncProducer(brokers, nil)
+		if err == nil {
+			log.Println("Producer created successfully!")
+			return producer, nil
+		}
+
+		log.Printf("Error connecting to Kafka: %v. Trying again  in %d seconds...", err, retryInterval)
+		time.Sleep(retryInterval * time.Second)
 	}
-	return producer, nil
+
+	return nil, fmt.Errorf("não foi possível criar o producer após %d tentativas: %v", maxRetries, err)
 }
 
 func sendEvent(producer sarama.SyncProducer, topic string, event entities.Event) error {
@@ -65,6 +79,7 @@ func sendEvent(producer sarama.SyncProducer, topic string, event entities.Event)
 }
 
 func init() {
+	time.Sleep(5 * time.Second)
 	brokerAddress = os.Getenv("BROKER_ADDRESS")
 	topicName = os.Getenv("TOPIC_NAME")
 
@@ -76,7 +91,7 @@ func init() {
 func main() {
 	producer, err := createProducer([]string{brokerAddress})
 	if err != nil {
-		log.Fatalf("Failed to producer: %v", err)
+		log.Fatalf("Failed to create Kafka producer: %v", err)
 	}
 	defer func() {
 		if err := producer.Close(); err != nil {
