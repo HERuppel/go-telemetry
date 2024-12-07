@@ -41,6 +41,17 @@ services:
     volumes:
       - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
 
+  producer:
+    build: ./producer
+    container_name: producer
+    environment:
+      - BROKER_ADDRESS=${BROKER_ADDRESS}
+      - TOPIC_NAME=${TOPIC_NAME}
+    depends_on:
+      - kafka
+      - mongo
+    restart: always
+
 volumes:
   zookeeper-volume:
   kafka-volume:
