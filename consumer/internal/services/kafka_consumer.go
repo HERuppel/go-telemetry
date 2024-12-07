@@ -31,13 +31,14 @@ func (ConsumerGroupHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
 
 func (consumerGroupHandler ConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		log.Printf("Received message: %s\n", string(msg.Value))
 
 		var event entities.Event
 		if err := json.Unmarshal(msg.Value, &event); err != nil {
 			log.Printf("Error unmarshaling message: %v", err)
 			continue
 		}
+
+		log.Printf("Received event:\n Type: %s\n Timestamp: %d\n Value: %.2f\n\n", event.Type, event.Timestamp, event.Value)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
