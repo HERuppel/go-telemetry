@@ -41,6 +41,21 @@ services:
     volumes:
       - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
 
+  consumer:
+    build: ./consumer
+    container_name: consumer
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - BROKER_ADDRESS=${BROKER_ADDRESS}
+      - TOPIC_NAME=${TOPIC_NAME}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_DB_COLLECTION=${MONGO_DB_COLLECTION}
+    ports:
+      - "3333:3333"
+    depends_on:
+      - kafka
+      - mongo
+
   producer:
     build: ./producer
     container_name: producer
@@ -50,6 +65,7 @@ services:
     depends_on:
       - kafka
       - mongo
+      - consumer
     restart: always
 
 volumes:
