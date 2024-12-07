@@ -53,3 +53,11 @@ func (eventsRepository *EventsRepository) FindAll(ctx context.Context, page, lim
 
 	return events, nil
 }
+
+func (eventsRepository *EventsRepository) Count(ctx context.Context) (int64, error) {
+	count, err := eventsRepository.collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}

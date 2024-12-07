@@ -1,0 +1,67 @@
+definitions:
+  entities.Event:
+    properties:
+      timestamp:
+        type: integer
+      type:
+        type: string
+      value:
+        type: number
+    type: object
+  entities.EventsResponse:
+    properties:
+      count:
+        type: integer
+      events:
+        items:
+          $ref: '#/definitions/entities.Event'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /events:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a paginated list of events stored in the database.
+      parameters:
+      - description: Number of items per page
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.EventsResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get events
+      tags:
+      - Events
+swagger: "2.0"

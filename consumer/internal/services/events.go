@@ -17,6 +17,16 @@ func NewEventsService(eventsRepository *repositories.EventsRepository) *EventsSe
 	}
 }
 
-func (eventsService *EventsService) Fetch(ctx *gin.Context, page, limit int) ([]entities.Event, error) {
-	return eventsService.eventsRepository.FindAll(ctx, page, limit)
+func (eventsService *EventsService) Fetch(ctx *gin.Context, page, limit int) ([]entities.Event, int64, error) {
+	events, err := eventsService.eventsRepository.FindAll(ctx, page, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	totalItems, err := eventsService.eventsRepository.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return events, totalItems, nil
 }

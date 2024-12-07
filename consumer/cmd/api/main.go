@@ -12,7 +12,11 @@ import (
 	"syscall"
 	"time"
 
+	_ "consumer/docs"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var (
@@ -33,6 +37,14 @@ func init() {
 	}
 }
 
+// @title           Go Telemtry
+// @version         1.0
+// @description     API that consumes, stores and returns events received with Kafka
+
+// @host      localhost:3333
+// @BasePath  /
+
+// @securityDefinitions.basic  BasicAuth
 func main() {
 	mongoStore := store.NewMongoStore(mongoURI, mongoDBName)
 	defer mongoStore.Close()
@@ -54,6 +66,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/events", eventsController.Fetch)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	go r.Run(":3333")
 
