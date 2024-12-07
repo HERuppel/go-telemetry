@@ -33,6 +33,9 @@ services:
   mongo:
     image: mongo:5.0
     container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     ports:
       - "27017:27017"
     volumes:
@@ -41,4 +44,3 @@ services:
 volumes:
   zookeeper-volume:
   kafka-volume:
-  mongo-data:
