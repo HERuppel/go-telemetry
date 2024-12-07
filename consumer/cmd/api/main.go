@@ -20,10 +20,11 @@ import (
 )
 
 var (
-	brokerAddress string
-	topicName     string
-	mongoURI      string
-	mongoDBName   string
+	brokerAddress     string
+	topicName         string
+	mongoURI          string
+	mongoDBName       string
+	mongoDBCollection string
 )
 
 func init() {
@@ -31,8 +32,9 @@ func init() {
 	topicName = os.Getenv("TOPIC_NAME")
 	mongoURI = os.Getenv("MONGO_URI")
 	mongoDBName = os.Getenv("MONGO_DB_NAME")
+	mongoDBCollection = os.Getenv("MONGO_DB_COLLECTION")
 
-	if brokerAddress == "" || topicName == "" || mongoURI == "" || mongoDBName == "" {
+	if brokerAddress == "" || topicName == "" || mongoURI == "" || mongoDBName == "" || mongoDBCollection == "" {
 		log.Fatal("BROKER_ADDRESS | TOPIC_NAME | MONGO vars not set in .env")
 	}
 }
@@ -49,7 +51,7 @@ func main() {
 	mongoStore := store.NewMongoStore(mongoURI, mongoDBName)
 	defer mongoStore.Close()
 
-	collection := mongoStore.Database.Collection("events")
+	collection := mongoStore.Database.Collection(mongoDBCollection)
 
 	eventsRepository := repositories.NewEventsRepository(collection)
 	eventsService := services.NewEventsService(eventsRepository)

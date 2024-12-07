@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mongo -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD <<EOF
-use telemetry;                
-db.createCollection("events")
+use $MONGO_DB_NAME;                
+db.createCollection($MONGO_DB_COLLECTION)
 print("Database successfully created!");
 EOF
