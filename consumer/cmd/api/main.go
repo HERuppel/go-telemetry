@@ -7,6 +7,7 @@ import (
 	"consumer/internal/store"
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -82,6 +83,9 @@ func main() {
 	r.GET("/events/metrics-by-day", eventsController.GetEventMetricsByDay)
 	r.GET("/metrics-since-day-one", metricsController.FetchSinceDayOne)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/ping", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{})
+	})
 
 	go r.Run(":3333")
 

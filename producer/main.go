@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/signal"
 	"producer/entities"
@@ -79,6 +80,33 @@ func sendEvent(producer sarama.SyncProducer, topic string, event entities.Event)
 	return nil
 }
 
+func pingConsumer() bool {
+	resp, err := http.Get("http://consumer:3333/ping")
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	return resp.StatusCode == http.StatusOK
+}
+
+func waitForConsumer(interval time.Duration, maxRetries int) bool {
+	retries := 0
+	for retries < maxRetries {
+		if pingConsumer() {
+			log.Println("Consumer is up!")
+			return true
+		}
+
+		retries++
+		log.Printf("Consumer not available. Attempt %d of %d. Retrying in %v...\n", retries, maxRetries, interval)
+		time.Sleep(interval)
+	}
+
+	log.Println("Failed to reach consumer, max number of attempts.")
+	return false
+}
+
 func init() {
 	brokerAddress = os.Getenv("BROKER_ADDRESS")
 	brokerPort = os.Getenv("BROKER_PORT")
@@ -90,6 +118,13 @@ func init() {
 }
 
 func main() {
+	interval := 5 * time.Second
+	maxRetries := 10
+
+	if !waitForConsumer(interval, maxRetries) {
+		log.Fatalf("Couldn't reach consumer...")
+	}
+
 	brokerConnection := brokerAddress + ":" + brokerPort
 
 	producer, err := createProducer([]string{brokerConnection})
@@ -101,8 +136,6 @@ func main() {
 			log.Printf("Error closing producer: %v", err)
 		}
 	}()
-
-	time.Sleep(5 * time.Second)
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
