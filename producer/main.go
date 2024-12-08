@@ -30,7 +30,7 @@ var (
 func generateRandomEvent() entities.Event {
 	return entities.Event{
 		Type:      eventTypes[rand.Intn(len(eventTypes))],
-		Timestamp: time.Now().Unix(),
+		Timestamp: time.Now().Add(-3 * time.Hour).Unix(),
 		Value:     rand.Float64() * 100,
 	}
 }
@@ -79,7 +79,6 @@ func sendEvent(producer sarama.SyncProducer, topic string, event entities.Event)
 }
 
 func init() {
-	time.Sleep(5 * time.Second)
 	brokerAddress = os.Getenv("BROKER_ADDRESS")
 	topicName = os.Getenv("TOPIC_NAME")
 
@@ -98,6 +97,8 @@ func main() {
 			log.Printf("Error closing producer: %v", err)
 		}
 	}()
+
+	time.Sleep(5 * time.Second)
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt)
