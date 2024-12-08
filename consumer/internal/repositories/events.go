@@ -63,7 +63,7 @@ func (eventsRepository *EventsRepository) Count(ctx context.Context) (int64, err
 	return count, nil
 }
 
-func (eventsRepository *EventsRepository) GetMetricsByDay(ctx context.Context, start, end int64) ([]entities.Metrics, error) {
+func (eventsRepository *EventsRepository) GetEventMetricsByDay(ctx context.Context, start, end int64) ([]entities.Metrics, error) {
 	pipeline := mongo.Pipeline{
 		{{Key: "$match", Value: bson.D{
 			{Key: "timestamp", Value: bson.D{

@@ -73,7 +73,7 @@ paths:
       summary: Get events
       tags:
       - Events
-  /metrics-by-day:
+  /events/metrics-by-day:
     get:
       consumes:
       - application/json

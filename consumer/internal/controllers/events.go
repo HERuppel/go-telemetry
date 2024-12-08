@@ -75,8 +75,8 @@ func (eventsController *EventsController) Fetch(ctx *gin.Context) {
 // @Success 200 {array} entities.Metrics
 // @Failure 400 {object} map[string]string "Bad request"
 // @Failure 500 {object} map[string]string "Internal server error"
-// @Router /metrics-by-day [get]
-func (eventsController *EventsController) GetMetricsByDay(ctx *gin.Context) {
+// @Router /events/metrics-by-day [get]
+func (eventsController *EventsController) GetEventMetricsByDay(ctx *gin.Context) {
 	date := ctx.DefaultQuery("date", time.Now().Add(-3*time.Hour).Format("2006-01-02"))
 
 	start, end, err := utils.GetUnixStartAndEndOfDay(date)
@@ -85,7 +85,7 @@ func (eventsController *EventsController) GetMetricsByDay(ctx *gin.Context) {
 		return
 	}
 
-	metrics, err := eventsController.eventsService.GetMetrics(ctx, start, end)
+	metrics, err := eventsController.eventsService.GetEventMetrics(ctx, start, end)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "INTERNAL_ERROR"})
 		return

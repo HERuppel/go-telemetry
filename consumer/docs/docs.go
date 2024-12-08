@@ -75,7 +75,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/metrics-by-day": {
+        "/events/metrics-by-day": {
             "get": {
                 "description": "Retrieves metrics reading the db by a given date",
                 "consumes": [

@@ -30,6 +30,6 @@ func (eventsService *EventsService) Fetch(ctx context.Context, page, limit int) 
 	return events, totalItems, nil
 }
 
-func (eventsService *EventsService) GetMetrics(ctx context.Context, start, end int64) ([]entities.Metrics, error) {
-	return eventsService.eventsRepository.GetMetricsByDay(ctx, start, end)
+func (eventsService *EventsService) GetEventMetrics(ctx context.Context, start, end int64) ([]entities.Metrics, error) {
+	return eventsService.eventsRepository.GetEventMetricsByDay(ctx, start, end)
 }

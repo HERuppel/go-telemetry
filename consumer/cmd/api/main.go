@@ -73,7 +73,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/events", eventsController.Fetch)
-	r.GET("/metrics-by-day", eventsController.GetMetricsByDay)
+	r.GET("/events/metrics-by-day", eventsController.GetEventMetricsByDay)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	go r.Run(":3333")
