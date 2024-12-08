@@ -21,6 +21,7 @@ import (
 
 var (
 	brokerAddress            string
+	brokerPort               string
 	topicName                string
 	mongoURI                 string
 	mongoDBName              string
@@ -30,14 +31,15 @@ var (
 
 func init() {
 	brokerAddress = os.Getenv("BROKER_ADDRESS")
+	brokerPort = os.Getenv("BROKER_PORT")
 	topicName = os.Getenv("TOPIC_NAME")
 	mongoURI = os.Getenv("MONGO_URI")
 	mongoDBName = os.Getenv("MONGO_DB_NAME")
 	mongoDBCollection = os.Getenv("MONGO_DB_COLLECTION")
 	mongoDBMetricsCollection = os.Getenv("MONGO_DB_METRICS_COLLECTION")
 
-	if brokerAddress == "" || topicName == "" || mongoURI == "" || mongoDBName == "" || mongoDBCollection == "" || mongoDBMetricsCollection == "" {
-		log.Fatal("BROKER_ADDRESS | TOPIC_NAME | MONGO vars not set in .env")
+	if brokerAddress == "" || brokerPort == "" || topicName == "" || mongoURI == "" || mongoDBName == "" || mongoDBCollection == "" || mongoDBMetricsCollection == "" {
+		log.Fatal("BROKER_ADDRESS | BROKER_PORT | TOPIC_NAME | MONGO vars not set in .env")
 	}
 }
 
@@ -64,7 +66,9 @@ func main() {
 	metricsService := services.NewMetricsService(metricsRepository)
 	metricsController := controllers.NewMetricsController(metricsService)
 
-	consumerGroup, err := services.SetupKafkaConsumer([]string{brokerAddress}, "events-consumer-group")
+	brokerConnection := brokerAddress + ":" + brokerPort
+
+	consumerGroup, err := services.SetupKafkaConsumer([]string{brokerConnection}, "events-consumer-group")
 	if err != nil {
 		log.Fatalf("Error creating consumer group: %v", err)
 	}

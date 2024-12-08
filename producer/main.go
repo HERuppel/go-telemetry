@@ -15,6 +15,7 @@ import (
 
 var (
 	brokerAddress string
+	brokerPort    string
 	topicName     string
 	eventTypes    = []string{
 		"VEHICLE_SPEED",
@@ -80,15 +81,18 @@ func sendEvent(producer sarama.SyncProducer, topic string, event entities.Event)
 
 func init() {
 	brokerAddress = os.Getenv("BROKER_ADDRESS")
+	brokerPort = os.Getenv("BROKER_PORT")
 	topicName = os.Getenv("TOPIC_NAME")
 
-	if brokerAddress == "" || topicName == "" {
-		log.Fatal("BROKER_ADDRESS or TOPIC_NAME not set in .env")
+	if brokerAddress == "" || brokerPort == "" || topicName == "" {
+		log.Fatal("BROKER_ADDRESS | BROKER_PORT | TOPIC_NAME not set in .env")
 	}
 }
 
 func main() {
-	producer, err := createProducer([]string{brokerAddress})
+	brokerConnection := brokerAddress + ":" + brokerPort
+
+	producer, err := createProducer([]string{brokerConnection})
 	if err != nil {
 		log.Fatalf("Failed to create Kafka producer: %v", err)
 	}
