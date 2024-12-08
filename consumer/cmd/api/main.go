@@ -20,11 +20,12 @@ import (
 )
 
 var (
-	brokerAddress     string
-	topicName         string
-	mongoURI          string
-	mongoDBName       string
-	mongoDBCollection string
+	brokerAddress            string
+	topicName                string
+	mongoURI                 string
+	mongoDBName              string
+	mongoDBCollection        string
+	mongoDBMetricsCollection string
 )
 
 func init() {
@@ -33,8 +34,9 @@ func init() {
 	mongoURI = os.Getenv("MONGO_URI")
 	mongoDBName = os.Getenv("MONGO_DB_NAME")
 	mongoDBCollection = os.Getenv("MONGO_DB_COLLECTION")
+	mongoDBMetricsCollection = os.Getenv("MONGO_DB_METRICS_COLLECTION")
 
-	if brokerAddress == "" || topicName == "" || mongoURI == "" || mongoDBName == "" || mongoDBCollection == "" {
+	if brokerAddress == "" || topicName == "" || mongoURI == "" || mongoDBName == "" || mongoDBCollection == "" || mongoDBMetricsCollection == "" {
 		log.Fatal("BROKER_ADDRESS | TOPIC_NAME | MONGO vars not set in .env")
 	}
 }
@@ -52,10 +54,13 @@ func main() {
 	defer mongoStore.Close()
 
 	collection := mongoStore.Database.Collection(mongoDBCollection)
+	metricsCollection := mongoStore.Database.Collection(mongoDBMetricsCollection)
 
 	eventsRepository := repositories.NewEventsRepository(collection)
 	eventsService := services.NewEventsService(eventsRepository)
 	eventsController := controllers.NewEventsController(eventsService)
+
+	metricsRepository := repositories.NewMetricsRepository(metricsCollection)
 
 	consumerGroup, err := services.SetupKafkaConsumer([]string{brokerAddress}, "events-consumer-group")
 	if err != nil {
@@ -63,7 +68,7 @@ func main() {
 	}
 	defer consumerGroup.Close()
 
-	consumerHandler := services.NewConsumerGroupHandler(eventsRepository)
+	consumerHandler := services.NewConsumerGroupHandler(eventsRepository, metricsRepository)
 
 	r := gin.Default()
 

@@ -12,12 +12,14 @@ import (
 )
 
 type ConsumerGroupHandler struct {
-	eventsRepository *repositories.EventsRepository
+	eventsRepository  *repositories.EventsRepository
+	metricsRepository *repositories.MetricsRepository
 }
 
-func NewConsumerGroupHandler(eventsRepository *repositories.EventsRepository) *ConsumerGroupHandler {
+func NewConsumerGroupHandler(eventsRepository *repositories.EventsRepository, metricsRepository *repositories.MetricsRepository) *ConsumerGroupHandler {
 	return &ConsumerGroupHandler{
-		eventsRepository: eventsRepository,
+		eventsRepository:  eventsRepository,
+		metricsRepository: metricsRepository,
 	}
 }
 
@@ -44,6 +46,10 @@ func (consumerGroupHandler ConsumerGroupHandler) ConsumeClaim(sess sarama.Consum
 
 		if err := consumerGroupHandler.eventsRepository.Insert(ctx, event); err != nil {
 			log.Printf("Error inserting into MongoDB: %v", err)
+		}
+
+		if err := consumerGroupHandler.metricsRepository.Upsert(ctx, event); err != nil {
+			log.Printf("Error upserting into MongoDB: %v", err)
 		}
 
 		cancel()
