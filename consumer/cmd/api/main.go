@@ -61,6 +61,8 @@ func main() {
 	eventsController := controllers.NewEventsController(eventsService)
 
 	metricsRepository := repositories.NewMetricsRepository(metricsCollection)
+	metricsService := services.NewMetricsService(metricsRepository)
+	metricsController := controllers.NewMetricsController(metricsService)
 
 	consumerGroup, err := services.SetupKafkaConsumer([]string{brokerAddress}, "events-consumer-group")
 	if err != nil {
@@ -74,6 +76,7 @@ func main() {
 
 	r.GET("/events", eventsController.Fetch)
 	r.GET("/events/metrics-by-day", eventsController.GetEventMetricsByDay)
+	r.GET("/metrics-since-day-one", metricsController.FetchSinceDayOne)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	go r.Run(":3333")

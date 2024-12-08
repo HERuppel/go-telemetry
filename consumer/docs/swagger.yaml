@@ -23,12 +23,23 @@ definitions:
     type: object
   entities.Metrics:
     properties:
+      count:
+        type: integer
+      eventType:
+        type: string
+      sum:
+        type: number
+    type: object
+  entities.MetricsResponse:
+    properties:
       averageValue:
         type: number
       count:
         type: integer
       eventType:
         type: string
+      sum:
+        type: number
     type: object
 info:
   contact: {}
@@ -105,6 +116,35 @@ paths:
               type: string
             type: object
       summary: Get metrics by day
+      tags:
+      - Metrics
+  /metrics-since-day-one:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves aggregated metrics since application day one
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.MetricsResponse'
+            type: array
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get metrics since application day one
       tags:
       - Metrics
 swagger: "2.0"

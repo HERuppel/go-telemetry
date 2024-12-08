@@ -126,6 +126,50 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/metrics-since-day-one": {
+            "get": {
+                "description": "Retrieves aggregated metrics since application day one",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Metrics"
+                ],
+                "summary": "Get metrics since application day one",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.MetricsResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -166,6 +210,20 @@ const docTemplate = `{
         "entities.Metrics": {
             "type": "object",
             "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "eventType": {
+                    "type": "string"
+                },
+                "sum": {
+                    "type": "number"
+                }
+            }
+        },
+        "entities.MetricsResponse": {
+            "type": "object",
+            "properties": {
                 "averageValue": {
                     "type": "number"
                 },
@@ -174,6 +232,9 @@ const docTemplate = `{
                 },
                 "eventType": {
                     "type": "string"
+                },
+                "sum": {
+                    "type": "number"
                 }
             }
         }

@@ -36,3 +36,37 @@ func (metricsRepository *MetricsRepository) Upsert(ctx context.Context, event en
 
 	return err
 }
+func (metricsRepository *MetricsRepository) FindAll(ctx context.Context) ([]entities.Metrics, error) {
+	var metricsToReturn []entities.Metrics
+
+	cursor, err := metricsRepository.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var metric entities.MetricsSinceDayOne
+		if err := cursor.Decode(&metric); err != nil {
+			return nil, err
+		}
+
+		if metric.Count > 0 {
+			metric.AverageValue = metric.Sum / float64(metric.Count)
+		} else {
+			metric.AverageValue = 0
+		}
+
+		metricsToReturn = append(metricsToReturn, entities.Metrics{
+			EventType:    metric.EventType,
+			AverageValue: metric.AverageValue,
+			Count:        metric.Count,
+		})
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return metricsToReturn, nil
+}
