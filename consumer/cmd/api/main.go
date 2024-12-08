@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -44,6 +45,8 @@ func init() {
 	}
 }
 
+var consumerGroupReady atomic.Bool
+
 // @title           Go Telemtry
 // @version         1.0
 // @description     API that consumes, stores and returns events received with Kafka
@@ -69,7 +72,7 @@ func main() {
 
 	brokerConnection := brokerAddress + ":" + brokerPort
 
-	consumerGroup, err := services.SetupKafkaConsumer([]string{brokerConnection}, "events-consumer-group")
+	consumerGroup, err := services.SetupKafkaConsumer([]string{brokerConnection}, "events-consumer-group", &consumerGroupReady)
 	if err != nil {
 		log.Fatalf("Error creating consumer group: %v", err)
 	}
@@ -84,7 +87,11 @@ func main() {
 	r.GET("/metrics-since-day-one", metricsController.FetchSinceDayOne)
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{})
+		if consumerGroupReady.Load() {
+			ctx.JSON(http.StatusOK, gin.H{})
+		} else {
+			ctx.JSON(http.StatusServiceUnavailable, gin.H{})
+		}
 	})
 
 	go r.Run(":3333")

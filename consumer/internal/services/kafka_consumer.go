@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"sync/atomic"
 	"time"
 
 	"github.com/IBM/sarama"
@@ -59,9 +60,10 @@ func (consumerGroupHandler ConsumerGroupHandler) ConsumeClaim(sess sarama.Consum
 	return nil
 }
 
-func SetupKafkaConsumer(brokers []string, groupID string) (sarama.ConsumerGroup, error) {
+func SetupKafkaConsumer(brokers []string, groupID string, consumerGroupReady *atomic.Bool) (sarama.ConsumerGroup, error) {
 	config := sarama.NewConfig()
 	config.Version = sarama.V2_0_0_0
+	config.Consumer.Offsets.Initial = sarama.OffsetOldest
 	config.Consumer.Offsets.AutoCommit.Enable = true
 	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second
 
@@ -76,6 +78,7 @@ func SetupKafkaConsumer(brokers []string, groupID string) (sarama.ConsumerGroup,
 		consumerGroup, err = sarama.NewConsumerGroup(brokers, groupID, config)
 		if err == nil {
 			log.Println("Kafka consumer connected successfully!")
+			consumerGroupReady.Store(true)
 			return consumerGroup, nil
 		}
 

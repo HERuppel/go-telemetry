@@ -29,6 +29,12 @@ var (
 	}
 )
 
+const (
+	dispatchEventInterval     = 5
+	pingConsumerRetryInterval = 5
+	pingConsumerMaxRetries    = 10
+)
+
 func generateRandomEvent() entities.Event {
 	return entities.Event{
 		Type:      eventTypes[rand.Intn(len(eventTypes))],
@@ -90,17 +96,15 @@ func pingConsumer() bool {
 	return resp.StatusCode == http.StatusOK
 }
 
-func waitForConsumer(interval time.Duration, maxRetries int) bool {
-	retries := 0
-	for retries < maxRetries {
+func waitForConsumer() bool {
+	for i := 0; i < pingConsumerMaxRetries; i++ {
 		if pingConsumer() {
 			log.Println("Consumer is up!")
 			return true
 		}
 
-		retries++
-		log.Printf("Consumer not available. Attempt %d of %d. Retrying in %v...\n", retries, maxRetries, interval)
-		time.Sleep(interval)
+		log.Printf("Consumer not available. Retrying in %d seconds...\n", pingConsumerRetryInterval)
+		time.Sleep(pingConsumerRetryInterval * time.Second)
 	}
 
 	log.Println("Failed to reach consumer, max number of attempts.")
@@ -118,10 +122,7 @@ func init() {
 }
 
 func main() {
-	interval := 5 * time.Second
-	maxRetries := 10
-
-	if !waitForConsumer(interval, maxRetries) {
+	if !waitForConsumer() {
 		log.Fatalf("Couldn't reach consumer...")
 	}
 
@@ -141,7 +142,7 @@ func main() {
 	signal.Notify(sigChan, os.Interrupt)
 
 	log.Println("Starting event producer...")
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(dispatchEventInterval * time.Second)
 	defer ticker.Stop()
 
 	for {
