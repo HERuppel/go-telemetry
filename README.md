@@ -6,7 +6,7 @@ Esse projeto conta com duas aplicações para envio e recebimento de dados em te
 ### Producer
 A aplicação Golang CLI que dispara os eventos de diferentes tipos preestabelecidos, com o tempo da ocorrência e um valor randômico que simula o valor de um sensor. O disparo de eventos ocorre numa frequência de cinco em cinco segundos.
 ### Consumer
-API em Golang que consome os eventos do broker Kafka, os armazena no banco não-relacional MongoDB e expõe rotas para consulta dos dados armazenados via requisição HTTP.
+API em Golang que consome os eventos do broker Kafka, os armazena no banco não-relacional MongoDB e expõe rotas para consulta dos dados armazenados via requisição HTTP. A API também possui uma rota pra visualizar algumas métricas por uma data específica, agregando os eventos pelo tipo e mostrando a quantidade de eventos e a média de valor para aquele tipo.
 
 ## Tech
 
@@ -31,7 +31,7 @@ docker compose up --build
 3 - Após a inicialização de todos os contêineres, a API ficará exposta em:
 
 ```sh
-http://localhost:3333/events
+http://localhost:3333/
 ```
 Ou, se preferir utilziar o Swagger:
 ```sh
