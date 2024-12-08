@@ -23,7 +23,7 @@ func NewMetricsController(metricsService *services.MetricsService) *MetricsContr
 // @Tags Metrics
 // @Accept json
 // @Produce json
-// @Success 200 {array} entities.MetricsResponse
+// @Success 200 {array} entities.Metrics
 // @Failure 400 {object} map[string]string "Bad request"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /metrics-since-day-one [get]

@@ -91,7 +91,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Date to filter metrics",
+                        "description": "Date to filter metrics, default date is today (format yyyy-MM-dd)",
                         "name": "date",
                         "in": "query"
                     }
@@ -146,7 +146,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.MetricsResponse"
+                                "$ref": "#/definitions/entities.Metrics"
                             }
                         }
                     },
@@ -210,20 +210,6 @@ const docTemplate = `{
         "entities.Metrics": {
             "type": "object",
             "properties": {
-                "count": {
-                    "type": "integer"
-                },
-                "eventType": {
-                    "type": "string"
-                },
-                "sum": {
-                    "type": "number"
-                }
-            }
-        },
-        "entities.MetricsResponse": {
-            "type": "object",
-            "properties": {
                 "averageValue": {
                     "type": "number"
                 },
@@ -232,9 +218,6 @@ const docTemplate = `{
                 },
                 "eventType": {
                     "type": "string"
-                },
-                "sum": {
-                    "type": "number"
                 }
             }
         }

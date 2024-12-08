@@ -84,7 +84,7 @@ func (eventsController *EventsController) Fetch(ctx *gin.Context) {
 // @Tags Metrics
 // @Accept json
 // @Produce json
-// @Param date query string false "Date to filter metrics"
+// @Param date query string false "Date to filter metrics, default date is today (format yyyy-MM-dd)"
 // @Success 200 {array} entities.Metrics
 // @Failure 400 {object} map[string]string "Bad request"
 // @Failure 500 {object} map[string]string "Internal server error"

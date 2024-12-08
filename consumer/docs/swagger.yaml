@@ -23,23 +23,12 @@ definitions:
     type: object
   entities.Metrics:
     properties:
-      count:
-        type: integer
-      eventType:
-        type: string
-      sum:
-        type: number
-    type: object
-  entities.MetricsResponse:
-    properties:
       averageValue:
         type: number
       count:
         type: integer
       eventType:
         type: string
-      sum:
-        type: number
     type: object
 info:
   contact: {}
@@ -90,7 +79,7 @@ paths:
       - application/json
       description: Retrieves metrics reading the db by a given date
       parameters:
-      - description: Date to filter metrics
+      - description: Date to filter metrics, default date is today (format yyyy-MM-dd)
         in: query
         name: date
         type: string
@@ -130,7 +119,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/entities.MetricsResponse'
+              $ref: '#/definitions/entities.Metrics'
             type: array
         "400":
           description: Bad request
