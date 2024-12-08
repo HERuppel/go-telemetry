@@ -55,11 +55,24 @@ func (eventsController *EventsController) Fetch(ctx *gin.Context) {
 		return
 	}
 
-	response := entities.EventsResponse{
-		Page:   int64(pageInt),
-		Limit:  int64(limitInt),
-		Count:  totalItems,
-		Events: events,
+	var response entities.EventsResponse
+
+	if len(events) == 0 {
+		response = entities.EventsResponse{
+			Page:   int64(pageInt),
+			Limit:  int64(limitInt),
+			Count:  totalItems,
+			Events: []entities.Event{},
+		}
+
+	} else {
+		response = entities.EventsResponse{
+			Page:   int64(pageInt),
+			Limit:  int64(limitInt),
+			Count:  totalItems,
+			Events: events,
+		}
+
 	}
 
 	ctx.JSON(http.StatusOK, response)

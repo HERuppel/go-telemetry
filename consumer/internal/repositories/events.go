@@ -79,7 +79,7 @@ func (eventsRepository *EventsRepository) GetEventMetricsByDay(ctx context.Conte
 		{{Key: "$project", Value: bson.D{
 			{Key: "eventType", Value: "$_id"},
 			{Key: "count", Value: 1},
-			{Key: "averageValue", Value: bson.D{{Key: "$round", Value: bson.A{"$averageValue", 2}}}},
+			{Key: "averageValue", Value: 1},
 			{Key: "_id", Value: 0},
 		}}},
 	}
