@@ -41,7 +41,7 @@ func (consumerGroupHandler ConsumerGroupHandler) ConsumeClaim(sess sarama.Consum
 			continue
 		}
 
-		log.Printf("Received event:\n Type: %s\n Timestamp: %d\n Value: %.2f\n\n", event.Type, event.Timestamp, event.Value)
+		log.Printf("Received event:\n Type: %s\n Timestamp: %d\n Value: %f\n\n", event.Type, event.Timestamp, event.Value)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 

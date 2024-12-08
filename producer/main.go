@@ -81,7 +81,7 @@ func sendEvent(producer sarama.SyncProducer, topic string, event entities.Event)
 		return err
 	}
 
-	log.Printf("Published event:\nType: %s\nTimestamp: %d\nValue: %.2f \n\n", event.Type, event.Timestamp, event.Value)
+	log.Printf("Published event:\nType: %s\nTimestamp: %d\nValue: %f \n\n", event.Type, event.Timestamp, event.Value)
 
 	return nil
 }
