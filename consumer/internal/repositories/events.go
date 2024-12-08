@@ -3,6 +3,7 @@ package repositories
 import (
 	"consumer/internal/entities"
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -60,4 +61,39 @@ func (eventsRepository *EventsRepository) Count(ctx context.Context) (int64, err
 		return 0, err
 	}
 	return count, nil
+}
+
+func (eventsRepository *EventsRepository) GetMetricsByDay(ctx context.Context, start, end int64) ([]entities.Metrics, error) {
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{
+			{Key: "timestamp", Value: bson.D{
+				{Key: "$gte", Value: start},
+				{Key: "$lte", Value: end},
+			}},
+		}}},
+		{{Key: "$group", Value: bson.D{
+			{Key: "_id", Value: "$type"},
+			{Key: "count", Value: bson.D{{Key: "$sum", Value: 1}}},
+			{Key: "averageValue", Value: bson.D{{Key: "$avg", Value: "$value"}}},
+		}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "eventType", Value: "$_id"},
+			{Key: "count", Value: 1},
+			{Key: "averageValue", Value: bson.D{{Key: "$round", Value: bson.A{"$averageValue", 2}}}},
+			{Key: "_id", Value: 0},
+		}}},
+	}
+
+	cursor, err := eventsRepository.collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, fmt.Errorf("error on aggregate: %v", err)
+	}
+	defer cursor.Close(ctx)
+
+	var metrics []entities.Metrics
+	if err := cursor.All(ctx, &metrics); err != nil {
+		return nil, fmt.Errorf("error on parse metrics %v", err)
+	}
+
+	return metrics, nil
 }

@@ -3,8 +3,7 @@ package services
 import (
 	"consumer/internal/entities"
 	"consumer/internal/repositories"
-
-	"github.com/gin-gonic/gin"
+	"context"
 )
 
 type EventsService struct {
@@ -17,7 +16,7 @@ func NewEventsService(eventsRepository *repositories.EventsRepository) *EventsSe
 	}
 }
 
-func (eventsService *EventsService) Fetch(ctx *gin.Context, page, limit int) ([]entities.Event, int64, error) {
+func (eventsService *EventsService) Fetch(ctx context.Context, page, limit int) ([]entities.Event, int64, error) {
 	events, err := eventsService.eventsRepository.FindAll(ctx, page, limit)
 	if err != nil {
 		return nil, 0, err
@@ -29,4 +28,8 @@ func (eventsService *EventsService) Fetch(ctx *gin.Context, page, limit int) ([]
 	}
 
 	return events, totalItems, nil
+}
+
+func (eventsService *EventsService) GetMetrics(ctx context.Context, start, end int64) ([]entities.Metrics, error) {
+	return eventsService.eventsRepository.GetMetricsByDay(ctx, start, end)
 }

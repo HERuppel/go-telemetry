@@ -63,6 +63,58 @@
                     }
                 }
             }
+        },
+        "/metrics-by-day": {
+            "get": {
+                "description": "Retrieves metrics reading the db by a given date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Metrics"
+                ],
+                "summary": "Get metrics by day",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Date to filter metrics",
+                        "name": "date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Metrics"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -97,6 +149,20 @@
                 },
                 "page": {
                     "type": "integer"
+                }
+            }
+        },
+        "entities.Metrics": {
+            "type": "object",
+            "properties": {
+                "averageValue": {
+                    "type": "number"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "eventType": {
+                    "type": "string"
                 }
             }
         }
