@@ -53,7 +53,7 @@ docker compose up --build
 ```sh
 http://localhost:3333/
 ```
-Ou, se preferir utilziar o Swagger:
+Ou, se preferir utilizar o Swagger:
 ```sh
 http://localhost:3333/swagger/index.html
 ```
